@@ -149,7 +149,7 @@ model Part {
 
   @@index([code], name: "idx_part_code")
   @@index([componentId], name: "idx_part_component")
-  @@index([status], name: "idx_peca_status")
+  @@index([status], name: "idx_part_status")
 }
 
 enum StatusPart {
