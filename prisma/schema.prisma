@@ -85,6 +85,77 @@ model Version {
   modelId Int
   model Model @relation(fields: [modelId], references: [id])
 
+  structure Structure[]
+
   @@index([modelId], name: "idx_version_model")
   @@unique([modelId, year], name: "uq_version_model_year")
+}
+
+model Structure {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name StructureEnums
+
+  versionId Int
+  versions Version @relation(fields: [versionId], references: [id])
+
+  components Component[]
+
+  @@index([versionId], name: "idx_structure_version")
+  @@unique([versionId, name], name: "uq_structure_version_name")
+}
+
+enum StructureEnums {
+  MOTOR
+  CHASSI
+  ELETRICA
+}
+
+model Component {
+  id Int @id @default(autoincrement())
+
+  name String @db.Char(150)
+  description String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  estructureId Int
+  structure Structure @relation(fields: [estructureId], references: [id])
+
+  part Part[]
+
+  @@index([estructureId], name: "idx_component_structure") 
+  @@unique([estructureId, name], name: "uq_component_structure_name")
+}
+
+model Part {
+  id Int @id @default(autoincrement())
+
+  code String
+  status StatusPart
+
+  description String @db.Text
+  amount Float @default(0)
+  
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  componentId Int
+  component Component @relation(fields: [componentId], references: [id])
+
+  @@index([code], name: "idx_part_code")
+  @@index([componentId], name: "idx_part_component")
+  @@index([status], name: "idx_peca_status")
+}
+
+enum StatusPart {
+  I  // INATIVO
+  P  // PARCIALMENTE INATIVO
+  A  // ATIVO
+  C  // DESCONTINUADO
+  S  // SEM CADASTRO
 }
