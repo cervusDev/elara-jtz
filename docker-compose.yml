@@ -1,0 +1,17 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    env_file:
+      - .env
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE_DOCKER}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD_DOCKER}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-volume:/var/lib/mysql
+
+volumes:
+  mysql-volume:
+    driver: local

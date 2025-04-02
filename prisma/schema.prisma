@@ -12,3 +12,79 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id String @id @default(uuid())
+
+  name String
+  password String
+  email String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Enterprise {
+  id Int @id @default(autoincrement())
+
+  name String @db.Char(50)
+  description String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Types Type[]
+  
+  @@index([name], name: "idx_enterprise_name")
+}
+
+model Type {
+  id Int @id @default(autoincrement())
+
+  name String @db.Char(100)
+  description String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  enterpriseId Int
+  enterprise Enterprise @relation(fields: [enterpriseId], references: [id])
+
+  models Model[]
+
+  @@index([enterpriseId], name: "idx_type_enterprise")
+  @@unique([enterpriseId, name], name: "uq_type_enterprise_name")
+}
+
+model Model {
+  id Int @id @default(autoincrement())
+
+  name String @db.Char(100)
+  description String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  typeId Int
+  type Type @relation(fields: [typeId], references: [id])
+
+  versions Version[]
+
+  @@index([typeId], name: "idx_model_type")
+  @@unique([typeId, name], name: "uq_model_type_name")
+}
+
+model Version {
+  id Int @id @default(autoincrement())
+
+  year String
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  modelId Int
+  model Model @relation(fields: [modelId], references: [id])
+
+  @@index([modelId], name: "idx_version_model")
+  @@unique([modelId, year], name: "uq_version_model_year")
+}
